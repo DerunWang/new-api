@@ -1,0 +1,31 @@
+name: Build Docker Tar
+
+on:
+  workflow_dispatch:
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          load: true
+          tags: new-api:local
+
+      - name: Save image tar
+        run: docker save -o new-api.tar new-api:local
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: new-api-image
+          path: new-api.tar
